@@ -11,12 +11,17 @@ st.title("Superkart Sale Prediction")
 # Section for online prediction
 st.subheader("Online Prediction")
 
-store_age_mapping = {
-    "Supermarket Type1": 39,
-    "Food Mart": 28,
-    "Departmental Store": 27,
-    "Supermarket Type2": 17
-}
+# store_age_mapping = {
+#     "Supermarket Type1": 39,
+#     "Food Mart": 28,
+#     "Departmental Store": 27,
+#     "Supermarket Type2": 17
+# }
+# # Automatically derive Store Age
+# Store_Age_Years = store_age_mapping[Store_Type]
+# # Display derived value but don't allow user to change it
+# st.number_input( "Store Age (Years)", value=Store_Age_Years, disabled=True)
+
 
 # Collect user input for property features
 Product_Weight = st.number_input("Product Weight", min_value=0.0, value=100.0)
@@ -27,10 +32,7 @@ Store_Size = st.selectbox("Store Size", ["High", "Medium", "Small"])
 Store_Location_City_Type = st.selectbox("Store Location City Type", ["Tier 1", "Tier 2", "Tier 3"])
 Store_Type = st.selectbox("Store Type", ["Supermarket Type1", "Supermarket Type2", "Departmental Store","Food Mart"])
 Product_Id_char = st.selectbox("Product_Id_char (First 2 Charecter of Product_ID)", ["FD", "NC", "DR"])
-# Automatically derive Store Age
-Store_Age_Years = store_age_mapping[Store_Type]
-# Display derived value but don't allow user to change it
-st.number_input( "Store Age (Years)", value=Store_Age_Years, disabled=True)
+Store_Age_Years = st.number_input( "Store Age (Years)", min_value=0, value=100)
 Product_Type_Category = st.selectbox("Product Type Category", ["Perishables", "Non Perishables"])
 
 # Convert user input into a DataFrame
@@ -49,7 +51,7 @@ input_data = pd.DataFrame({
 
 # Make prediction when the "Predict" button is clicked
 if st.button("Predict", type="primary"):
-    response = requests.post(f"{BACKEND_URL}/v1/rental", json=input_data.to_dict(orient='records')[0])  # Send data to Flask API
+    response = requests.post(f"{BACKEND_URL}/v1/superkart", json=input_data.to_dict(orient='records')[0])  # Send data to Flask API
     if response.status_code == 200:
         prediction = response.json()['Predicted Sale (in dollars)']
         st.success(f"Predicted Sale (in dollars): {prediction}")
@@ -65,7 +67,7 @@ uploaded_file = st.file_uploader("Upload CSV file for batch prediction", type=["
 # Make batch prediction when the "Predict Batch" button is clicked
 if uploaded_file is not None:
     if st.button("Predict Batch", type="primary"):
-        response = requests.post(f"{BACKEND_URL}/v1/rentalbatch", files={"file": uploaded_file})  # Send file to Flask API
+        response = requests.post(f"{BACKEND_URL}/v1/superkartbatch", files={"file": uploaded_file})  # Send file to Flask API
         if response.status_code == 200:
             predictions = response.json()
             st.success("Batch predictions completed!")
